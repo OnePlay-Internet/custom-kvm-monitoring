@@ -1,6 +1,6 @@
 # System Monitoring Scripts
 
-This repository contains Python scripts for gathering host machine information and sending it to InfluxDB. The scripts cover various aspects, including disk statistics, KVM virtual machine status, and sensor readings.
+Modified for Monitoring End to End KVM + Libvirt Machines
 
 ## Prerequisites
 
@@ -10,36 +10,9 @@ Make sure you have the following installed on your system:
 - InfluxDB
 - [InfluxDB Python Client](https://github.com/influxdata/influxdb-client-python)
 
-## Installation
-Run this line to install.
-
-```bash
-bash -c "$(curl -fsSL https://bugswriter.com/pve2influx-install.sh)"
-```
-
 ## Usage
 
-1. Clone the repository:
-
-    ```bash
-    git clone https://github.com/bugswriter/pve2influx.git
-    cd pve2influx
-    ```
-
-2. Set up a virtual environment (optional but recommended):
-
-    ```bash
-    python -m venv env
-    source env/bin/activate
-    ```
-
-3. Install dependencies:
-
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-4. Set up your InfluxDB configuration by creating a `.env` file with the following variables:
+1. Set up your InfluxDB configuration by creating a `.env` file with the following variables:
 
     ```env
     INFLUX_URL="https://your-influxdb-url:8086"
@@ -47,35 +20,9 @@ bash -c "$(curl -fsSL https://bugswriter.com/pve2influx-install.sh)"
     INFLUX_ORG="your-influxdb-organization"
     INFLUX_BUCKET="your-influxdb-bucket"
     ```
-
-5. Run the desired scripts:
+2. Run the script:
 
     ```bash
-    python disk.py
-    python vmstatus.py
-    python sensors.py
-    # Add more scripts as needed
+    python main.py
     ```
-
-## Scripts
-
-### 1. disk.py
-
-This script retrieves disk statistics and sends them to InfluxDB.
-
-### 2. vmstatus.py
-
-Monitors the status of KVM virtual machines and logs the information to InfluxDB.
-
-### 3. sensors.py
-
-Gathers sensor readings from the host machine and stores them in InfluxDB.
-
-## Contributing
-
-Feel free to contribute by opening issues, suggesting improvements, or submitting pull requests.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
