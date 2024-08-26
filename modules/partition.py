@@ -44,8 +44,12 @@ def get_disk_usage_for_mount_points(mnt_directory='/mnt'):
 
 
 def collect_data():
-    mnt_directory = '/mnt'
-    return get_disk_usage_for_mount_points(mnt_directory)
+    try:
+        mnt_directory = '/mnt'
+        return get_disk_usage_for_mount_points(mnt_directory)
+    except Exception as e:
+        print(str(e))
+    return {}
 
 
 if __name__ == "__main__":

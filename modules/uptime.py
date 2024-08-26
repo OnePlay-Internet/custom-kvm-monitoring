@@ -23,12 +23,17 @@ def get_system_uptime_seconds():
         return None
 
 def collect_data():
-	hostname = socket.gethostname()
-	uptime_seconds = get_system_uptime_seconds()
-	return {
-		"host": hostname,
-		"uptime": uptime_seconds
-	}
+    try:
+        hostname = socket.gethostname()
+        uptime_seconds = get_system_uptime_seconds()
+        return {
+            "host": hostname,
+            "uptime": uptime_seconds
+        }
+    except Exception as e:
+        print(str(e))
+    return {}
+
 
 if __name__=="__main__":
 	print(collect_data())

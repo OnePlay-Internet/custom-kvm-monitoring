@@ -57,17 +57,22 @@ def get_smartctl_data(disk_path):
         "media_and_data_integrity_errors": int(media_and_data_integrity_errors)
     }
 
+
 def collect_data():
-    if os.getenv("STORAGE_SERVER"):
-        disks = get_nvme_disk_names()
-        disk_data = []
-        for disk in disks:
-            disk_data.append(get_smartctl_data(f"/dev/{disk}"))
+    try:
+        if os.getenv("STORAGE_SERVER"):
+            disks = get_nvme_disk_names()
+            disk_data = []
+            for disk in disks:
+                disk_data.append(get_smartctl_data(f"/dev/{disk}"))
 
-        return disk_data
+            return disk_data
 
-    disk_path = os.getenv("DISK_PATH")
-    return get_smartctl_data(disk_path)
+        disk_path = os.getenv("DISK_PATH")
+        return get_smartctl_data(disk_path)
+    except Exception as e:
+        print(str(e))
+    return {}
 
 
 if __name__=="__main__":
