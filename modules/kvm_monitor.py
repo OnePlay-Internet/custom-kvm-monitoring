@@ -74,6 +74,9 @@ def filter_and_group_host_stats(hostname, host_uuid, data):
         for key in host_key_groups:
             data_group = group_data_points(key_prefix=key, source_data=data)
             if data_group:
+                if host_key_groups[key] == "memory":
+                    for k, v in data_group.items():
+                        data_group[k] = round(v / (1024*1024), 2)
                 data_group.update({"host": hostname, "host_uuid": host_uuid})
                 to_return[host_key_groups[key]] = data_group
         return to_return
