@@ -4,6 +4,7 @@
         {"name": "disk", "interval_seconds": 600},
         {"name": "partition", "interval_seconds": 3600},
         {"name": "sensors", "interval_seconds": 60},
-        {"name": "kvm_monitor", "interval_seconds": 5}
+        {"name": "kvm_monitor", "interval_seconds": 5},
+        {"name": "network", "interval_seconds": 5}
     ]
 }

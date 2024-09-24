@@ -114,7 +114,7 @@ def send_data_to_influxdb(data):
             write_api.write(bucket=INFLUX_BUCKET, org=INFLUX_ORG, record=point)
             print(f"writing record for {key} finished.")
     else:
-        print('No data found')
+        print('Uploaded all data points from kvm_monitor')
 
 
 def merge_lists_of_dicts(list1, list2, key):
