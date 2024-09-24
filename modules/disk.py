@@ -1,7 +1,9 @@
 import os
 import socket
 import subprocess
-import json
+
+import ujson
+
 
 def get_nvme_disk_names():
     try:
@@ -16,16 +18,33 @@ def get_nvme_disk_names():
         return []
 
 
+def get_disk_stats(disk_path):
+    try:
+        output = subprocess.check_output(
+            args=['sudo', '-S', 'smartctl', '-j', '-a', disk_path],
+            input=f'{os.getenv("ROOT_PASS")}\n',
+            universal_newlines=True
+        )
+        if output and output.startswith('{ "'):
+            data = ujson.loads(output)
+            return data
+    except subprocess.CalledProcessError as e:
+        print(f"Command failed with exit status {e.returncode}")
+        if e.output and e.output.startswith('{\n'):
+            data = ujson.loads(e.output)
+            return data
+    except Exception as e:
+        print(str(e))
+    return {}
+
+
 def get_smartctl_data(disk_path):
 
     if disk_path is None:
         print("DISK_PATH environment variable is not set.")
         return None
 
-    command_output = subprocess.check_output(['smartctl', '-j', '-a', disk_path]).decode('utf-8')
-
-    # Parse JSON output
-    smart_data = json.loads(command_output)
+    smart_data = get_disk_stats(disk_path)
 
     # Extract relevant values from the JSON data
     hostname = socket.gethostname()
