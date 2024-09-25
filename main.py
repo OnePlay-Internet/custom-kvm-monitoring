@@ -5,6 +5,7 @@ import importlib
 import schedule
 
 from connection import create_influxdb_point, write_api, INFLUX_BUCKET, INFLUX_ORG
+from modules import MONITORING_INTERVAL
 
 
 def load_config():
@@ -37,9 +38,9 @@ if __name__ == '__main__':
     modules_config = load_config()
     for module_config in modules_config:
         module_name = module_config["name"]
-        interval_seconds = module_config.get("interval_seconds", False)
+        # interval_seconds = module_config.get("interval_seconds", False)
 
-        schedule.every(interval_seconds).seconds.do(
+        schedule.every(MONITORING_INTERVAL).seconds.do(
             run_module, module_name=module_name)
 
     while True:

@@ -5,12 +5,13 @@ from xml.etree import ElementTree
 
 import inotify.adapters
 import libvirt
+import psutil
 
 import ujson
 import time
 
 from connection import create_influxdb_point, write_api, INFLUX_BUCKET, INFLUX_ORG
-
+from modules import MONITORING_INTERVAL
 
 VM_STATE_DEFINITION = {
     libvirt.VIR_DOMAIN_NOSTATE: "no_state",
@@ -77,6 +78,8 @@ def filter_and_group_host_stats(hostname, host_uuid, data):
                 if host_key_groups[key] == "memory":
                     for k, v in data_group.items():
                         data_group[k] = round(v / (1024*1024), 2)
+                if host_key_groups[key] == "cpustat":
+                    data_group['cpu_usage'] = psutil.cpu_percent(interval=MONITORING_INTERVAL)
                 data_group.update({"host": hostname, "host_uuid": host_uuid})
                 to_return[host_key_groups[key]] = data_group
         return to_return
