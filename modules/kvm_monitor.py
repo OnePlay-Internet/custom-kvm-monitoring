@@ -9,6 +9,7 @@ import psutil
 
 import ujson
 import time
+import traceback
 
 from connection import create_influxdb_point, write_api, INFLUX_BUCKET, INFLUX_ORG
 from modules import MONITORING_INTERVAL
@@ -39,6 +40,7 @@ def get_vms_with_state():
             vm_stats.append(vm_stat)
         return vm_stats
     except Exception as e:
+        print(traceback.format_exc())
         return []
 
 
@@ -51,7 +53,7 @@ def get_kvm_stats():
             data = ujson.loads(output)
             return data
     except Exception as e:
-        print(str(e))
+        print(traceback.format_exc())
     return {}
 
 
@@ -61,6 +63,7 @@ def sync_data_to_influx_db(data):
         write_api.write(bucket=INFLUX_BUCKET, org=INFLUX_ORG, record=point)
         print(f"writing record for kvm_stats finished.")
     except Exception as e:
+        print(traceback.format_exc())
         return
 
 
@@ -84,7 +87,7 @@ def filter_and_group_host_stats(hostname, host_uuid, data):
                 to_return[host_key_groups[key]] = data_group
         return to_return
     except Exception as e:
-        print(e)
+        print(traceback.format_exc())
         return {}
 
 
@@ -106,7 +109,7 @@ def filter_and_group_vm_stats(hostname, host_uuid, data):
                 to_return[f"vm_{host_key_groups[key]}"] = data_group
         return to_return
     except Exception as e:
-        print(e)
+        print(traceback.format_exc())
         return {}
 
 
@@ -167,7 +170,7 @@ def send_data(log):
                 send_data_to_influxdb(filter_and_group_vm_stats(hostname, host_uuid, data=vm_stats))
         return True
     except Exception as e:
-        print(str(e))
+        print(traceback.format_exc())
         return
 
 
@@ -228,7 +231,10 @@ def get_cpu_usage_percentage(vm):
     # Calculate CPU usage percentage
     current_time = time.time()
     duration = round(current_time - last_timestamp)
-    cpu_usage_percentage = (cpu_time_used / (duration * no_v_cpus)) * 100  # 1 second interval
+    if duration and no_v_cpus:
+        cpu_usage_percentage = (cpu_time_used / (duration * no_v_cpus)) * 100  # 1 second interval
+    else:
+        cpu_usage_percentage = 0.0
 
     set_vm_last_known_cpu_time(vm.name(), total_cpu_time, current_time)
 
@@ -316,7 +322,7 @@ def get_vms_and_host_stats():
         return host_information, vm_stats
 
     except Exception as e:
-        print(str(e))
+        print(traceback.format_exc())
     finally:
         conn.close()
 
@@ -328,7 +334,7 @@ def collect_data():
         data = get_kvm_stats()
         return send_data(data)
     except Exception as e:
-        print(e)
+        print(traceback.format_exc())
     return False
 
 
