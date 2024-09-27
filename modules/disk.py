@@ -4,6 +4,8 @@ import subprocess
 
 import ujson
 
+from modules import logger
+
 
 def get_nvme_disk_names():
     try:
@@ -14,7 +16,7 @@ def get_nvme_disk_names():
         return nvme_disks
 
     except subprocess.CalledProcessError as e:
-        print(f"Error: {e}")
+        logger.debug(f"Error: {e}")
         return []
 
 
@@ -29,19 +31,19 @@ def get_disk_stats(disk_path):
             data = ujson.loads(output)
             return data
     except subprocess.CalledProcessError as e:
-        print(f"Command failed with exit status {e.returncode}")
+        logger.debug(f"Command failed with exit status {e.returncode}")
         if e.output and e.output.startswith('{\n'):
             data = ujson.loads(e.output)
             return data
     except Exception as e:
-        print(str(e))
+        logger.debug(str(e))
     return {}
 
 
 def get_smartctl_data(disk_path):
 
     if disk_path is None:
-        print("DISK_PATH environment variable is not set.")
+        logger.debug("DISK_PATH environment variable is not set.")
         return None
 
     smart_data = get_disk_stats(disk_path)
@@ -90,9 +92,9 @@ def collect_data():
         disk_path = os.getenv("DISK_PATH")
         return get_smartctl_data(disk_path)
     except Exception as e:
-        print(str(e))
+        logger.debug(str(e))
     return {}
 
 
 if __name__=="__main__":
-    print(collect_data())
+    logger.debug(collect_data())

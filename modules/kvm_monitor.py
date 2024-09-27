@@ -12,7 +12,7 @@ import time
 import traceback
 
 from connection import create_influxdb_point, write_api, INFLUX_BUCKET, INFLUX_ORG
-from modules import MONITORING_INTERVAL
+from modules import MONITORING_INTERVAL, logger
 
 VM_STATE_DEFINITION = {
     libvirt.VIR_DOMAIN_NOSTATE: "no_state",
@@ -40,7 +40,7 @@ def get_vms_with_state():
             vm_stats.append(vm_stat)
         return vm_stats
     except Exception as e:
-        print(traceback.format_exc())
+        logger.debug(traceback.format_exc())
         return []
 
 
@@ -53,7 +53,7 @@ def get_kvm_stats():
             data = ujson.loads(output)
             return data
     except Exception as e:
-        print(traceback.format_exc())
+        logger.debug(traceback.format_exc())
     return {}
 
 
@@ -61,9 +61,9 @@ def sync_data_to_influx_db(data):
     try:
         point = create_influxdb_point('kvm_stats', data)
         write_api.write(bucket=INFLUX_BUCKET, org=INFLUX_ORG, record=point)
-        print(f"writing record for kvm_stats finished.")
+        logger.debug(f"writing record for kvm_stats finished.")
     except Exception as e:
-        print(traceback.format_exc())
+        logger.debug(traceback.format_exc())
         return
 
 
@@ -87,7 +87,7 @@ def filter_and_group_host_stats(hostname, host_uuid, data):
                 to_return[host_key_groups[key]] = data_group
         return to_return
     except Exception as e:
-        print(traceback.format_exc())
+        logger.debug(traceback.format_exc())
         return {}
 
 
@@ -109,7 +109,7 @@ def filter_and_group_vm_stats(hostname, host_uuid, data):
                 to_return[f"vm_{host_key_groups[key]}"] = data_group
         return to_return
     except Exception as e:
-        print(traceback.format_exc())
+        logger.debug(traceback.format_exc())
         return {}
 
 
@@ -118,9 +118,9 @@ def send_data_to_influxdb(data):
         if value:
             point = create_influxdb_point(key, value)
             write_api.write(bucket=INFLUX_BUCKET, org=INFLUX_ORG, record=point)
-            print(f"writing record for {key} finished.")
+            logger.debug(f"writing record for {key} finished.")
     else:
-        print('Uploaded all data points from kvm_monitor')
+        logger.debug('Uploaded all data points from kvm_monitor')
 
 
 def merge_lists_of_dicts(list1, list2, key):
@@ -170,7 +170,7 @@ def send_data(log):
                 send_data_to_influxdb(filter_and_group_vm_stats(hostname, host_uuid, data=vm_stats))
         return True
     except Exception as e:
-        print(traceback.format_exc())
+        logger.debug(traceback.format_exc())
         return
 
 
@@ -322,7 +322,7 @@ def get_vms_and_host_stats():
         return host_information, vm_stats
 
     except Exception as e:
-        print(traceback.format_exc())
+        logger.debug(traceback.format_exc())
     finally:
         conn.close()
 
@@ -334,7 +334,7 @@ def collect_data():
         data = get_kvm_stats()
         return send_data(data)
     except Exception as e:
-        print(traceback.format_exc())
+        logger.debug(traceback.format_exc())
     return False
 
 

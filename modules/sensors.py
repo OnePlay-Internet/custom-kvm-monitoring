@@ -2,6 +2,8 @@ import socket
 import json
 import subprocess
 
+from modules import logger
+
 
 def get_sensor_data():
     # Run the 'sensors -j' command
@@ -28,7 +30,7 @@ def collect_data():
     try:
         return get_sensor_data()
     except Exception as e:
-        print(str(e))
+        logger.debug(str(e))
     return {}
 
 

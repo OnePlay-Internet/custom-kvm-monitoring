@@ -1,8 +1,8 @@
-import os
 import socket
+import traceback
 from threading import Thread
 import inotify.adapters
-import time
+from modules import logger
 
 def parse_data(log):
 	log_parts = log.split(':')
@@ -32,9 +32,11 @@ def collect_data_continuously():
 					last_line = lines[-1].strip()
 					t1 = Thread(target=parse_data, args=(last_line,))
 					t1.run()
+	except Exception:
+		logger.debug(f"Failed to capture vm_status {traceback.format_exc()}")
 
 	finally:
 		i.remove_watch(log_file)
 
-if __name__=="__main__":		
-	collect_data()
+# if __name__=="__main__":
+# 	collect_data()

@@ -23,6 +23,6 @@ Make sure you have the following installed on your system:
 2. Run the script:
 
     ```bash
-    python main.py
+    python system_monitor.py
     ```
 

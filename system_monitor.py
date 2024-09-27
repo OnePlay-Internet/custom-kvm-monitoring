@@ -5,7 +5,7 @@ import importlib
 import schedule
 
 from connection import create_influxdb_point, write_api, INFLUX_BUCKET, INFLUX_ORG
-from modules import MONITORING_INTERVAL
+from modules import MONITORING_INTERVAL, logger
 
 
 def load_config():
@@ -26,12 +26,12 @@ def run_module(module_name):
             for record in data:
                 point = create_influxdb_point(module_name, record)
                 write_api.write(bucket=INFLUX_BUCKET, org=INFLUX_ORG, record=point)
-                print(f"writing record for {module_name} finished.")
+                logger.debug(f"writing record for {module_name} finished.")
 
         else:
             point = create_influxdb_point(module_name, data)
             write_api.write(bucket=INFLUX_BUCKET, org=INFLUX_ORG, record=point)
-            print(f"writing record for {module_name} finished.")
+            logger.debug(f"writing record for {module_name} finished.")
 
 
 if __name__ == '__main__':

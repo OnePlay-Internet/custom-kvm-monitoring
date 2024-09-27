@@ -1,6 +1,6 @@
-import subprocess
-import re
 import socket
+from modules import logger
+
 
 def get_system_uptime_seconds():
     try:
@@ -10,7 +10,7 @@ def get_system_uptime_seconds():
             return int(uptime_seconds % 60)
 
     except Exception as e:
-        print(f"Error reading uptime: {e}")
+        logger.debug(f"Error reading uptime: {e}")
     return 0
 
 def collect_data():
@@ -22,7 +22,7 @@ def collect_data():
             "uptime": uptime_seconds
         }
     except Exception as e:
-        print(str(e))
+        logger.debug(str(e))
     return {}
 
 

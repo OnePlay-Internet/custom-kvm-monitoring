@@ -1,6 +1,7 @@
 import socket
 import os
 import psutil
+from modules import logger
 
 def get_disk_space_usage(device):
     try:
@@ -40,7 +41,7 @@ def get_disk_usage_for_mount_points(mnt_directory='/mnt'):
         return data
 
     except Exception as e:
-        print(f"Error: {e}")
+        logger.debug(f"Error: {e}")
 
 
 def collect_data():
@@ -48,7 +49,7 @@ def collect_data():
         mnt_directory = '/mnt'
         return get_disk_usage_for_mount_points(mnt_directory)
     except Exception as e:
-        print(str(e))
+        logger.debug(str(e))
     return {}
 
 
