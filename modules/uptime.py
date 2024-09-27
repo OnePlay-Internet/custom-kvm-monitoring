@@ -7,7 +7,7 @@ def get_system_uptime_seconds():
         with open('/proc/uptime', 'r') as f:
             # Read the first line from /proc/uptime
             uptime_seconds = float(f.readline().split()[0])
-            return int(uptime_seconds % 60)
+            return int(uptime_seconds)
 
     except Exception as e:
         logger.debug(f"Error reading uptime: {e}")
