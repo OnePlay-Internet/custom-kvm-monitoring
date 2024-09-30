@@ -1,34 +1,30 @@
-import subprocess
-import re
 import socket
+from modules import logger
+
 
 def get_system_uptime_seconds():
     try:
-        uptime_output = subprocess.check_output(['uptime']).decode('utf-8').strip()
-        uptime_match = re.search(r"up(?:\s+)?((\d+) days?,)?(?:\s+)?(\d+):(\d+)", uptime_output)
-
-        if uptime_match:
-            # Corrected line: Convert numeric day value to integer
-            days = int(uptime_match.group(2)) if uptime_match.group(2) else 0
-            hours, minutes = map(int, uptime_match.group(3, 4))
-
-            uptime_seconds = days * 24 * 60 * 60 + hours * 60 * 60 + minutes * 60
-
-            return uptime_seconds
-        else:
-            raise ValueError("Unable to parse uptime information")
+        with open('/proc/uptime', 'r') as f:
+            # Read the first line from /proc/uptime
+            uptime_seconds = float(f.readline().split()[0])
+            return int(uptime_seconds)
 
     except Exception as e:
-        print(f"Error: {e}")
-        return None
+        logger.debug(f"Error reading uptime: {e}")
+    return 0
 
 def collect_data():
-	hostname = socket.gethostname()
-	uptime_seconds = get_system_uptime_seconds()
-	return {
-		"host": hostname,
-		"uptime": uptime_seconds
-	}
+    try:
+        hostname = socket.gethostname()
+        uptime_seconds = get_system_uptime_seconds()
+        return {
+            "host": hostname,
+            "uptime": uptime_seconds
+        }
+    except Exception as e:
+        logger.debug(str(e))
+    return {}
+
 
 if __name__=="__main__":
 	print(collect_data())

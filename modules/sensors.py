@@ -2,6 +2,8 @@ import socket
 import json
 import subprocess
 
+from modules import logger
+
 
 def get_sensor_data():
     # Run the 'sensors -j' command
@@ -23,8 +25,13 @@ def get_sensor_data():
         "cpu tccd2": sensor_data.get("k10temp-pci-00c3", {}).get("Tccd2", {}).get("temp4_input"),
     }
 
+
 def collect_data():
-    return get_sensor_data()
+    try:
+        return get_sensor_data()
+    except Exception as e:
+        logger.debug(str(e))
+    return {}
 
 
 if __name__=="__main__":

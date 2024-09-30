@@ -1,33 +1,30 @@
+import socket
+import time
+import traceback
+
 import psutil
-from time import sleep
 
-def get_network_data(interface):
-    stats_before = psutil.net_io_counters(pernic=True)[interface]
-    sleep(5)  # Adjust the sleep duration as needed
-    stats_after = psutil.net_io_counters(pernic=True)[interface]
+from modules import logger
 
-    receive_bytes = stats_after.bytes_recv - stats_before.bytes_recv
-    transmit_bytes = stats_after.bytes_sent - stats_before.bytes_sent
+io, last_captured_time = psutil.net_io_counters(pernic=True), time.time()
 
-    return receive_bytes, transmit_bytes
-
-def main():
-    network_interface = "enp6s0"
-    interval_seconds = 5
-
+def collect_data():
     try:
-        while True:
-            receive_bytes, transmit_bytes = get_network_data(network_interface)
-
-            print(f"Network Interface: {network_interface}")
-            print(f"Received Data: {receive_bytes} bytes")
-            print(f"Transmitted Data: {transmit_bytes} bytes")
-            print("=" * 30)
-
-            sleep(interval_seconds)
-
-    except KeyboardInterrupt:
-        print("Script terminated by user.")
-
-if __name__ == "__main__":
-    main()
+        global io, last_captured_time
+        io_2, recent_captured_time = psutil.net_io_counters(pernic=True), time.time()
+        delay = recent_captured_time - last_captured_time
+        data = {}
+        for iface, iface_io in io.items():
+            upload_speed, download_speed = io_2[iface].bytes_sent - iface_io.bytes_sent, io_2[iface].bytes_recv - iface_io.bytes_recv
+            data.update({
+                f"{iface}_download": io_2[iface].bytes_recv,
+                f"{iface}_upload": io_2[iface].bytes_sent,
+                f"{iface}_upload_speed": round(upload_speed / delay) ,
+                f"{iface}_download_speed": round(download_speed / delay),
+            })
+        io, last_captured_time = io_2, recent_captured_time
+        data.update({"host": socket.gethostname()})
+        return data
+    except Exception:
+        logger.debug(f"Failed to capture network stats {traceback.format_exc()}")
+        return {}

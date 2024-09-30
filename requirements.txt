@@ -10,3 +10,5 @@ schedule==1.2.1
 six==1.16.0
 typing_extensions==4.8.0
 urllib3==2.1.0
+libvirt-python==10.7.0
+ujson==5.10.0
